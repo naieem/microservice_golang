@@ -4,40 +4,61 @@ import (
   "github.com/gin-gonic/gin"
 )
 
-func GetInstructions(c *gin.Context){
-  selDB, err := dbmap.Query("SELECT title,description FROM articles")
-  if err != nil {
-    c.JSON(404, gin.H{"error": err.Error()})
-  }else{
-  // Call the struct to be rendered on template
-  n := Instruction{}
+// func GetInstructions(c *gin.Context){
+//   // selDB, err := dbmap.Query("SELECT title,description FROM articles")
+//   // if err != nil {
+//   //   c.JSON(404, gin.H{"error": err.Error()})
+//   // }else{
+//   // // Call the struct to be rendered on template
+//   // n := Instruction{}
 
-  // Create a slice to store all data from struct
-  res := []Instruction{}
+//   // // Create a slice to store all data from struct
+//   // res := []Instruction{}
 
-  // Read all rows from database
-    for selDB.Next() {
-      // Must create this variables to store temporary query
-      // var id int
-      var title, description string
+//   // // Read all rows from database
+//   //   for selDB.Next() {
+//   //     // Must create this variables to store temporary query
+//   //     // var id int
+//   //     var title, description string
 
-      // Scan each row storing values from the variables above and check for errors
-      err = selDB.Scan(&title, &description)
-      if err != nil {
-        panic(err.Error())
-      }
+//   //     // Scan each row storing values from the variables above and check for errors
+//   //     err = selDB.Scan(&title, &description)
+//   //     if err != nil {
+//   //       panic(err.Error())
+//   //     }
 
-      // Get the Scan into the Struct
-      // n.Id = id
-      n.Title = title
-      n.Description = description
+//   //     // Get the Scan into the Struct
+//   //     // n.Id = id
+//   //     n.Title = title
+//   //     n.Description = description
 
-      // Join each row on struct inside the Slice
-      res = append(res, n)
+//   //     // Join each row on struct inside the Slice
+//   //     res = append(res, n)
 
-    }
-    c.JSON(200, res)
+//   //   }
+//   //   c.JSON(200, res)
+//   // }
+//   var instructions []Instruction
+  
+//   err := dbmap.Select(&instructions, "SELECT * FROM articles")
+//   if err == nil { 
+//     c.JSON(200, instructions)
+//   } else {
+//     c.JSON(404, gin.H{"error": "instruction not found"})
+//   }
+
+// }
+
+func GetInstructions(c *gin.Context) {
+  var instructions []Instruction
+  _, err := dbmap.Select(&instructions, "SELECT title,description FROM articles")
+  if err == nil {
+    c.JSON(200, instructions)
+  } else {
+    panic(err.Error())
+    c.JSON(404, gin.H{"error": "no instruction(s) into the table"})
   }
+  // curl -i http://localhost:8080/api/v1/instructions
 }
 
 func UpdateInstruction(c *gin.Context) {
